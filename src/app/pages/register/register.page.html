@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Crear cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="box">
+    <ion-segment [(ngModel)]="role" name="role">
+      <ion-segment-button value="client">
+        <ion-label>Cliente</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="driver">
+        <ion-label>Conductor</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <form (ngSubmit)="submit()">
+      <ion-list lines="full">
+        <ion-list-header>
+          <ion-label>Datos personales</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-input label="Nombre completo" labelPlacement="floating" name="name" [(ngModel)]="name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Correo" labelPlacement="floating" type="email" name="email" [(ngModel)]="email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Teléfono" labelPlacement="floating" type="tel" name="phone" [(ngModel)]="phone"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="Contraseña"
+            labelPlacement="floating"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            helperText="Mínimo 8 caracteres"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+
+      @if (role === 'driver') {
+        <ion-list lines="full">
+          <ion-list-header>
+            <ion-label>Licencia y vehículo</ion-label>
+          </ion-list-header>
+          <ion-item>
+            <ion-input label="Número de licencia" labelPlacement="floating" name="licenseNumber" [(ngModel)]="licenseNumber"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Placa" labelPlacement="floating" name="plate" [(ngModel)]="plate"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Marca" labelPlacement="floating" name="brand" [(ngModel)]="brand"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Modelo" labelPlacement="floating" name="model" [(ngModel)]="model"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Año" labelPlacement="floating" type="number" name="year" [(ngModel)]="year"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Capacidad (pasajeros)" labelPlacement="floating" type="number" name="capacity" [(ngModel)]="capacity"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input label="Color" labelPlacement="floating" name="color" [(ngModel)]="color"></ion-input>
+          </ion-item>
+        </ion-list>
+      }
+
+      @if (error) {
+        <ion-text color="danger">
+          <p class="error">{{ error }}</p>
+        </ion-text>
+      }
+
+      <ion-button type="submit" expand="block" color="dark" [disabled]="loading">
+        @if (loading) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          Registrarme
+        }
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

@@ -1,0 +1,45 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="ride-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/client/trips" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Calificar viaje</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ride-page ion-padding">
+  <div class="ride-container">
+    <h1 class="title">¿Cómo estuvo <span>tu viaje?</span></h1>
+
+    <div class="stars">
+      @for (n of stars; track n) {
+        <button type="button" class="star" [class.on]="n <= score" (click)="setScore(n)" [attr.aria-label]="n + ' estrellas'">
+          ★
+        </button>
+      }
+    </div>
+
+    <label class="ride-label">Comentario (opcional)</label>
+    <textarea class="ride-input" rows="3" [(ngModel)]="comment" name="comment" placeholder="Cuéntanos tu experiencia"></textarea>
+
+    <div class="incident">
+      <span>Reportar una incidencia</span>
+      <ion-toggle [(ngModel)]="hasIncident" name="hasIncident"></ion-toggle>
+    </div>
+
+    @if (error) {
+      <p class="ride-error">{{ error }}</p>
+    }
+    @if (success) {
+      <p class="ride-success">{{ success }}</p>
+    }
+
+    <button class="ride-btn" (click)="submit()" [disabled]="sending || !!success">
+      @if (sending) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        Enviar calificación
+      }
+    </button>
+  </div>
+</ion-content>

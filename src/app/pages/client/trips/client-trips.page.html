@@ -1,0 +1,67 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="ride-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/client" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis viajes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ride-page ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="ride-container">
+    @if (error) {
+      <p class="ride-error">{{ error }}</p>
+    }
+
+    @if (loading) {
+      <div class="center"><ion-spinner name="crescent"></ion-spinner></div>
+    } @else if (!trips.length) {
+      <div class="empty">
+        <p>Aún no tienes viajes.</p>
+        <button class="ride-btn" (click)="router.navigateByUrl('/client')">Pedir mi primer viaje →</button>
+      </div>
+    } @else {
+      @for (trip of trips; track trip.id) {
+        <div class="ride-card trip">
+          <div class="row">
+            <span class="badge" [class.ok]="trip.status === 'completed'" [class.ko]="trip.status === 'cancelled'">
+              {{ statusLabel(trip.status) }}
+            </span>
+            @if (trip.final_fare) {
+              <span class="fare">$ {{ trip.final_fare | number: '1.0-0' }}</span>
+            }
+          </div>
+
+          @if (trip.origin_name || trip.destination_name) {
+            <p class="route">{{ trip.origin_name }} → {{ trip.destination_name }}</p>
+          }
+
+          <p class="muted">
+            @if (trip.driver?.user?.name) {
+              {{ trip.driver.user.name }}
+            }
+            @if (trip.vehicle?.plate) {
+              · {{ trip.vehicle.plate }}
+            }
+          </p>
+
+          @if (trip.completed_at) {
+            <p class="muted small">{{ trip.completed_at | date: 'dd/MM/yyyy h:mm a' }}</p>
+          }
+
+          @if (trip.status === 'completed') {
+            @if (trip.rating) {
+              <p class="rated">Calificado ★ {{ trip.rating.score }}</p>
+            } @else {
+              <button class="ride-link rate" (click)="rate(trip)">Calificar viaje ★</button>
+            }
+          }
+        </div>
+      }
+    }
+  </div>
+</ion-content>

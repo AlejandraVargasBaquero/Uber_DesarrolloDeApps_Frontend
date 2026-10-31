@@ -1,0 +1,158 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+/* ===== RideApp: tema global ===== */
+:root {
+  --ride-bg: #0e0f0f;
+  --ride-surface: #1a1c1c;
+  --ride-green: #2ee28a;
+  --ride-green-dark: #22c476;
+  --ride-text: #ffffff;
+  --ride-muted: #8a8f8d;
+  --ride-line: #2f3332;
+  --ion-font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Estilos compartidos de pantallas RideApp */
+.ride-page {
+  --background: var(--ride-bg);
+  color: var(--ride-text);
+}
+
+.ride-toolbar {
+  --background: var(--ride-bg);
+  --color: var(--ride-text);
+  --border-width: 0;
+}
+
+.ride-card {
+  background: var(--ride-surface);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.ride-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ride-muted);
+  margin-bottom: 6px;
+}
+
+.ride-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--ride-line);
+  outline: none;
+  color: var(--ride-text);
+  font-family: inherit;
+  font-size: 16px;
+  padding: 6px 0 10px;
+  margin-bottom: 18px;
+
+  &:focus {
+    border-bottom-color: var(--ride-green);
+  }
+
+  &::placeholder {
+    color: #5c615f;
+  }
+}
+
+.ride-btn {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ride-green);
+  color: #0e0f0f;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+
+  &.outline {
+    background: transparent;
+    color: var(--ride-text);
+    border: 1.5px solid var(--ride-line);
+  }
+
+  &.danger {
+    background: transparent;
+    color: #ff6b6b;
+    border: 1.5px solid #ff6b6b55;
+  }
+}
+
+.ride-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  color: var(--ride-green);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ride-error {
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
+.ride-success {
+  color: var(--ride-green);
+  font-size: 14px;
+}
+
+.ride-container {
+  max-width: 520px;
+  margin: 0 auto;
+}

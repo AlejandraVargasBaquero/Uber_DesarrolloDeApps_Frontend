@@ -1,0 +1,54 @@
+.title {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 16px 0 24px;
+
+  span {
+    color: var(--ride-green);
+  }
+}
+
+.stars {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 42px;
+  line-height: 1;
+  color: var(--ride-line);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s;
+
+  &.on {
+    color: var(--ride-green);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+textarea.ride-input {
+  resize: none;
+}
+
+.incident {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0 24px;
+
+  ion-toggle {
+    --track-background-checked: var(--ride-green);
+  }
+}
+
+ion-spinner {
+  color: #0e0f0f;
+}

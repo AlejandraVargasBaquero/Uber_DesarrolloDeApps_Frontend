@@ -1,0 +1,131 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="ride-toolbar">
+    <ion-title><strong>RideApp</strong></ion-title>
+    <ion-buttons slot="end">
+      <button class="ride-link toolbar-link" (click)="router.navigateByUrl('/client/trips')">Mis viajes</button>
+      <button class="ride-link toolbar-link muted" (click)="logout()">Salir</button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ride-page ion-padding">
+  <div class="ride-container">
+    <h1 class="hello">
+      Hola, <span>{{ user?.name?.split(' ')?.[0] }}</span>
+    </h1>
+
+    @if (error) {
+      <p class="ride-error">{{ error }}</p>
+    }
+    @if (message) {
+      <p class="ride-success">{{ message }}</p>
+    }
+
+    @if (loadingActive) {
+      <div class="center"><ion-spinner name="crescent"></ion-spinner></div>
+    } @else if (active) {
+      <!-- ===== Viaje / solicitud activa ===== -->
+      <div class="ride-card active-card">
+        <span class="ride-label">{{ activeType === 'trip' ? 'Viaje activo' : 'Solicitud activa' }}</span>
+        <h2 class="status">{{ statusLabel(active.status) }}</h2>
+
+        @if (active.origin_name || active.destination_name) {
+          <div class="route">
+            <p><span class="dot green"></span>{{ active.origin_name }}</p>
+            <p><span class="dot"></span>{{ active.destination_name }}</p>
+          </div>
+        }
+
+        @if (active.estimated_fare) {
+          <p class="fare">$ {{ active.estimated_fare | number: '1.0-0' }} <small>COP</small></p>
+        }
+
+        @if (active.driver) {
+          <div class="driver">
+            <span class="ride-label">Conductor</span>
+            <p class="driver-name">
+              {{ active.driver.user?.name }}
+              @if (active.driver.rating_average) {
+                <span class="rating">★ {{ active.driver.rating_average }}</span>
+              }
+            </p>
+            @if (active.driver.user?.phone) {
+              <p class="muted">Tel: {{ active.driver.user.phone }}</p>
+            }
+          </div>
+        }
+
+        @if (active.vehicle) {
+          <div class="vehicle">
+            <span class="plate">{{ active.vehicle.plate }}</span>
+            <span>{{ active.vehicle.brand }} {{ active.vehicle.model }} · {{ active.vehicle.color }}</span>
+          </div>
+        }
+
+        @if (active.driver?.latest_location) {
+          <p class="muted small">
+            Ubicación del conductor: {{ active.driver.latest_location.latitude }},
+            {{ active.driver.latest_location.longitude }}
+          </p>
+        }
+
+        <div class="actions">
+          <button class="ride-btn outline" (click)="loadActive()">Actualizar</button>
+          @if (active.status === 'requested' || active.status === 'assigned' || active.status === 'driver_arrived') {
+            <button class="ride-btn danger" (click)="cancel()" [disabled]="cancelling">
+              {{ cancelling ? 'Cancelando…' : 'Cancelar' }}
+            </button>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- ===== Nuevo viaje ===== -->
+      <div class="ride-card">
+        <div class="card-head">
+          <span class="ride-label">¿A dónde vamos?</span>
+          <button class="ride-link" (click)="fillExample()">Usar ejemplo</button>
+        </div>
+
+        <label class="ride-label">Origen</label>
+        <input class="ride-input" [(ngModel)]="originName" name="originName" placeholder="Dirección de recogida" />
+        <div class="coords">
+          <input class="ride-input" type="number" [(ngModel)]="originLat" name="originLat" placeholder="Latitud" />
+          <input class="ride-input" type="number" [(ngModel)]="originLng" name="originLng" placeholder="Longitud" />
+        </div>
+        <button class="ride-link locate" (click)="useMyLocation()" [disabled]="locating">
+          {{ locating ? 'Obteniendo ubicación…' : '◎ Usar mi ubicación' }}
+        </button>
+
+        <label class="ride-label">Destino</label>
+        <input class="ride-input" [(ngModel)]="destName" name="destName" placeholder="¿A dónde vas?" />
+        <div class="coords">
+          <input class="ride-input" type="number" [(ngModel)]="destLat" name="destLat" placeholder="Latitud" />
+          <input class="ride-input" type="number" [(ngModel)]="destLng" name="destLng" placeholder="Longitud" />
+        </div>
+
+        <button class="ride-btn outline" (click)="doEstimate()" [disabled]="estimating">
+          {{ estimating ? 'Calculando…' : 'Calcular tarifa' }}
+        </button>
+      </div>
+
+      @if (estimate) {
+        <div class="ride-card estimate">
+          <span class="ride-label">Tarifa estimada</span>
+          <p class="fare big">$ {{ estimate.estimated_fare | number: '1.0-0' }} <small>{{ estimate.currency }}</small></p>
+          <p class="muted">{{ estimate.distance_km }} km · {{ estimate.duration_min }} min aprox.</p>
+          @if (estimate.fare_breakdown.surge_multiplier && estimate.fare_breakdown.surge_multiplier > 1) {
+            <p class="surge">Tarifa dinámica x{{ estimate.fare_breakdown.surge_multiplier }}</p>
+          }
+        </div>
+      }
+
+      <button class="ride-btn" (click)="requestRide()" [disabled]="requesting">
+        @if (requesting) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          Pedir viaje →
+        }
+      </button>
+    }
+  </div>
+</ion-content>

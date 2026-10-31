@@ -1,0 +1,67 @@
+<ion-content [fullscreen]="true" class="ride-login">
+  <div class="screen">
+    <!-- Decoración -->
+    <div class="circle-big"></div>
+    <div class="circle-outline"></div>
+
+    <header class="brand">UBER APP</header>
+
+    <h1 class="headline">
+      Muévete<br />
+      sin<br />
+      <span>esperas.</span>
+    </h1>
+
+    <form class="form" (ngSubmit)="submit()">
+      <label class="field">
+        <span class="field-label">Correo o teléfono</span>
+        <input type="text" name="login" [(ngModel)]="login" placeholder="cliente@uber.com" autocomplete="username" />
+      </label>
+
+      <label class="field field-password">
+        <span class="field-label">Contraseña</span>
+        <div class="field-row">
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button type="button" class="link-green" (click)="router.navigateByUrl('/forgot-password')">
+            ¿La olvidaste?
+          </button>
+        </div>
+      </label>
+
+      @if (error) {
+      <p class="error">{{ error }}</p>
+      }
+
+      <div class="spacer"></div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        @if (loading) {
+        <ion-spinner name="crescent"></ion-spinner>
+        } @else { Ingresar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M5 12h14M13 6l6 6-6 6"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        }
+      </button>
+
+      <p class="footer">
+        ¿Nuevo?
+        <button type="button" class="link-white" (click)="goRegister('client')">Crear cuenta</button>
+        <span class="dot">·</span>
+        <button type="button" class="link-green" (click)="goRegister('driver')">Quiero conducir</button>
+      </p>
+    </form>
+  </div>
+</ion-content>

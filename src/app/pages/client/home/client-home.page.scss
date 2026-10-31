@@ -1,0 +1,150 @@
+.toolbar-link {
+  margin-right: 14px;
+
+  &.muted {
+    color: var(--ride-muted);
+  }
+}
+
+.hello {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 8px 0 20px;
+
+  span {
+    color: var(--ride-green);
+  }
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.coords {
+  display: flex;
+  gap: 16px;
+}
+
+.locate {
+  display: block;
+  margin: -6px 0 22px;
+}
+
+.active-card {
+  border: 1px solid var(--ride-green-dark);
+}
+
+.status {
+  margin: 4px 0 16px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.route p {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--ride-text);
+  flex-shrink: 0;
+
+  &.green {
+    background: var(--ride-green);
+    border-color: var(--ride-green);
+  }
+}
+
+.fare {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 12px 0 4px;
+
+  &.big {
+    font-size: 34px;
+    color: var(--ride-green);
+  }
+
+  small {
+    font-size: 13px;
+    color: var(--ride-muted);
+    font-weight: 500;
+  }
+}
+
+.driver {
+  margin-top: 16px;
+}
+
+.driver-name {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.rating {
+  color: var(--ride-green);
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.vehicle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.plate {
+  background: #f5d000;
+  color: #111;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+}
+
+.muted {
+  color: var(--ride-muted);
+  margin: 0;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.surge {
+  color: #f5a623;
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.ride-btn + .ride-btn {
+  margin-top: 0;
+}
+
+ion-spinner {
+  color: var(--ride-green);
+}

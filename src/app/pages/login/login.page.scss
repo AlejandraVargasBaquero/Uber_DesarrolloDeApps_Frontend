@@ -1,0 +1,188 @@
+.ride-login {
+  --background: var(--ride-bg);
+  color: var(--ride-text);
+}
+
+.screen {
+  position: relative;
+  min-height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Círculos decorativos ---- */
+.circle-big {
+  position: absolute;
+  top: -70px;
+  right: -90px;
+  width: 270px;
+  height: 270px;
+  border-radius: 50%;
+  background: var(--ride-green);
+}
+
+.circle-outline {
+  position: absolute;
+  top: 105px;
+  right: 92px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--ride-green);
+}
+
+/* ---- Marca y titular ---- */
+.brand {
+  position: relative;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.2px;
+}
+
+.headline {
+  position: relative;
+  margin: 120px 0 44px;
+  font-size: 44px;
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+
+  span {
+    color: var(--ride-green);
+  }
+}
+
+/* ---- Formulario ---- */
+.form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.field {
+  display: block;
+  padding-bottom: 12px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--ride-line);
+  transition: border-color 0.2s;
+
+  &:focus-within {
+    border-bottom-color: var(--ride-green);
+  }
+}
+
+.field-password {
+  border-bottom-color: var(--ride-green-dark);
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ride-muted);
+  margin-bottom: 8px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ride-text);
+  font-family: inherit;
+  font-size: 17px;
+  padding: 0;
+
+  &::placeholder {
+    color: #5c615f;
+  }
+
+  &[type='password'] {
+    letter-spacing: 3px;
+  }
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.link-green {
+  color: var(--ride-green);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.link-white {
+  color: var(--ride-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin: -8px 0 12px;
+}
+
+.spacer {
+  flex: 1;
+  min-height: 40px;
+}
+
+/* ---- Botón principal ---- */
+.btn-primary {
+  width: 100%;
+  height: 58px;
+  border-radius: 999px;
+  background: var(--ride-green);
+  color: #0e0f0f;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition:
+    transform 0.1s,
+    background 0.2s;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+  }
+
+  ion-spinner {
+    color: #0e0f0f;
+  }
+}
+
+.footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--ride-muted);
+  margin: 22px 0 0;
+
+  .dot {
+    margin: 0 6px;
+  }
+}

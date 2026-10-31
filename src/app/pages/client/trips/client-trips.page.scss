@@ -1,0 +1,73 @@
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+ion-spinner {
+  color: var(--ride-green);
+}
+
+.empty {
+  text-align: center;
+  padding-top: 40px;
+  color: var(--ride-muted);
+
+  .ride-btn {
+    margin-top: 16px;
+  }
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ride-line);
+
+  &.ok {
+    background: #2ee28a22;
+    color: var(--ride-green);
+  }
+
+  &.ko {
+    background: #ff6b6b22;
+    color: #ff6b6b;
+  }
+}
+
+.fare {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.route {
+  margin: 0 0 6px;
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--ride-muted);
+  margin: 0 0 4px;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.rate {
+  margin-top: 10px;
+}
+
+.rated {
+  color: var(--ride-green);
+  font-size: 13px;
+  margin: 10px 0 0;
+}

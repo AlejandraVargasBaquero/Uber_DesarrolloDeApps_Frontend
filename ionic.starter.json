@@ -1,0 +1,12 @@
+{
+  "name": "Blank Starter",
+  "baseref": "main",
+  "tarignore": [
+    "node_modules",
+    "package-lock.json",
+    "www"
+  ],
+  "scripts": {
+    "test": "npm run lint && npm run build && npm run test:unit && npx playwright install --with-deps chromium && npm run test:e2e"
+  }
+}
