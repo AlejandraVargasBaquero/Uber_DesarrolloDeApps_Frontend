@@ -1,0 +1,470 @@
+<ion-content [fullscreen]="true" class="ride-page">
+  <div class="layout">
+    <!-- Barra lateral -->
+    <aside>
+      <span class="logo">R</span>
+      @for (n of nav; track n.key) {
+        <button class="nav" [class.on]="section === n.key" (click)="go(n.key)" [attr.title]="n.label" [attr.aria-label]="n.label">
+          @switch (n.icon) {
+            @case ('grid') {
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5" /><rect x="14" y="4" width="6" height="6" rx="1.5" /><rect x="4" y="14" width="6" height="6" rx="1.5" /><rect x="14" y="14" width="6" height="6" rx="1.5" /></svg>
+            }
+            @case ('user') {
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
+            }
+            @case ('car') {
+              <svg viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5" /><path d="M4 16h16v3H4z" /><circle cx="8" cy="13" r="0.5" /><circle cx="16" cy="13" r="0.5" /></svg>
+            }
+            @case ('money') {
+              <svg viewBox="0 0 24 24"><path d="M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3S9.5 10.5 12 11s4.5 1.3 4.5 3.2-2 3.3-4.5 3.3-4.5-1.3-4.5-3" /></svg>
+            }
+            @case ('chart') {
+              <svg viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8" /></svg>
+            }
+            @default {
+              <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" /></svg>
+            }
+          }
+          <span class="nav-label">{{ n.label }}</span>
+        </button>
+      }
+    </aside>
+
+    <main>
+      <header>
+        <div>
+          <small>Panel de administración</small>
+          <h1>{{ title }}</h1>
+        </div>
+        <div class="head-right">
+          <input class="search" [(ngModel)]="search" name="search" placeholder="Buscar viaje, conductor…" />
+          <button class="ride-avatar small" (click)="logout()" title="Cerrar sesión">{{ initials(user?.name) || 'AD' }}</button>
+        </div>
+      </header>
+
+      @if (error) {
+        <p class="ride-error">{{ error }}</p>
+      }
+      @if (loading) {
+        <div class="loading"><ion-spinner name="crescent"></ion-spinner></div>
+      }
+
+      <!-- ================= RESUMEN ================= -->
+      @if (section === 'summary') {
+        <section class="kpis">
+          <div class="kpi hero">
+            <small>Ingresos totales</small>
+            <strong>{{ cop(stats.total_revenue) }}</strong>
+            <span>{{ stats.completed_trips ?? 0 }} viajes completados · {{ stats.cancelled_trips ?? 0 }} cancelados</span>
+          </div>
+          <div class="kpi">
+            <small>Clientes</small>
+            <strong>{{ stats.total_clients ?? 0 }}</strong>
+          </div>
+          <div class="kpi">
+            <small>Conductores</small>
+            <strong>
+              {{ stats.total_drivers ?? 0 }}
+              @if (stats.pending_drivers) {
+                <em>· {{ stats.pending_drivers }} por aprobar</em>
+              }
+            </strong>
+          </div>
+          <div class="kpi">
+            <small>Viajes activos</small>
+            <strong>{{ stats.active_trips ?? 0 }}</strong>
+          </div>
+          <div class="kpi">
+            <small>Solicitudes pendientes</small>
+            <strong>{{ stats.pending_requests ?? 0 }}</strong>
+          </div>
+        </section>
+
+        <section class="cols">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Por aprobar</h2>
+              <span class="ride-chip">{{ pending.length }} pendiente{{ pending.length === 1 ? '' : 's' }}</span>
+            </div>
+            @for (d of filtered(pending); track d.id) {
+              <div class="pending">
+                <span class="ride-avatar ring small">{{ initials(d.user?.name) }}</span>
+                <div class="who">
+                  <strong>{{ d.user?.name }}</strong>
+                  <small>{{ d.user?.email }} · Licencia {{ d.license_number }}</small>
+                </div>
+                @if (d.vehicles?.[0]; as v) {
+                  <span class="ride-plate">{{ v.plate }}</span>
+                  <small class="car">{{ v.brand }} {{ v.model }} {{ v.year }}</small>
+                }
+                <button class="btn-approve" (click)="openDecision(d, 'approved')">Aprobar</button>
+                <button class="btn-reject" (click)="openDecision(d, 'rejected')">Rechazar</button>
+              </div>
+            } @empty {
+              <p class="empty">No hay conductores pendientes.</p>
+            }
+
+            <h2 class="mt">Viajes recientes</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Conductor</th>
+                    <th>Tarifa</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (t of filtered(recentTrips); track t.id) {
+                    <tr>
+                      <td class="muted">#{{ t.id }}</td>
+                      <td>{{ t.client?.name ?? t.client?.user?.name ?? '—' }}</td>
+                      <td>{{ t.driver?.user?.name ?? t.driver?.name ?? '—' }}</td>
+                      <td class="ride-mono">{{ cop(t.final_fare ?? t.estimated_fare) }}</td>
+                      <td>
+                        <span class="ride-chip" [class.red]="t.status === 'cancelled'" [class.gray]="t.status !== 'completed' && t.status !== 'cancelled'">
+                          {{ statusLabel(t.status) }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="5" class="empty">Sin viajes recientes.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel side">
+            <div class="panel-head">
+              <h2>Tarifa activa</h2>
+              @if (activeFare) {
+                <span class="active-dot">● Activa</span>
+              }
+            </div>
+            @if (activeFare) {
+              <small class="muted">{{ activeFare.name }}</small>
+              <dl class="ride-mono fare-list">
+                <dt>base_fare</dt><dd>{{ cop(activeFare.base_fare) }}</dd>
+                <dt>price_per_km</dt><dd>{{ cop(activeFare.price_per_km) }}</dd>
+                <dt>price_per_minute</dt><dd>{{ cop(activeFare.price_per_minute) }}</dd>
+                <dt>minimum_fare</dt><dd>{{ cop(activeFare.minimum_fare) }}</dd>
+                <dt>surge_multiplier</dt><dd class="green">×{{ activeFare.surge_multiplier }}</dd>
+              </dl>
+            } @else {
+              <p class="empty">No hay tarifa activa.</p>
+            }
+            <div class="spacer"></div>
+            <button class="btn-outline" (click)="openFare()">+ Nueva tarifa</button>
+            <div class="incidents">
+              <span>Incidencias recientes</span>
+              <span class="muted">{{ recentIncidents.length ? recentIncidents.length : 'Ninguna' }}</span>
+            </div>
+            @for (i of recentIncidents.slice(0, 3); track $index) {
+              <p class="incident">
+                ⚠ Viaje #{{ i.trip_id ?? i.id }} · {{ i.comment ?? i.description ?? 'Incidencia reportada' }}
+              </p>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ================= CONDUCTORES ================= -->
+      @if (section === 'drivers') {
+        <div class="filters">
+          @for (f of [['', 'Todos'], ['pending', 'Pendientes'], ['approved', 'Aprobados'], ['rejected', 'Rechazados'], ['suspended', 'Suspendidos']]; track f[0]) {
+            <button class="filter" [class.on]="driverFilter === f[0]" (click)="driverFilter = f[0]; loadDrivers()">{{ f[1] }}</button>
+          }
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Conductor</th>
+                  <th>Licencia</th>
+                  <th>Vehículo</th>
+                  <th>Calificación</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of filtered(drivers); track d.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ d.user?.name }}</strong><br />
+                      <small class="muted">{{ d.user?.email }}</small>
+                    </td>
+                    <td class="ride-mono">{{ d.license_number }}</td>
+                    <td>
+                      @if (d.vehicles?.[0]; as v) {
+                        <span class="ride-plate">{{ v.plate }}</span> <small class="muted">{{ v.brand }} {{ v.model }}</small>
+                      }
+                    </td>
+                    <td>★ {{ d.rating_average ?? '—' }}</td>
+                    <td>
+                      <span
+                        class="ride-chip"
+                        [class.amber]="d.approval_status === 'pending'"
+                        [class.red]="d.approval_status === 'rejected' || d.approval_status === 'suspended'"
+                      >
+                        {{ approvalLabel(d.approval_status) }}
+                      </span>
+                    </td>
+                    <td class="actions">
+                      @if (d.approval_status !== 'approved') {
+                        <button class="btn-approve" (click)="openDecision(d, 'approved')">Aprobar</button>
+                      }
+                      @if (d.approval_status === 'pending') {
+                        <button class="btn-reject" (click)="openDecision(d, 'rejected')">Rechazar</button>
+                      }
+                      @if (d.approval_status === 'approved') {
+                        <button class="btn-reject" (click)="openDecision(d, 'suspended')">Suspender</button>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="6" class="empty">No hay conductores con este filtro.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- ================= VIAJES ================= -->
+      @if (section === 'trips') {
+        <div class="filters form">
+          <select [(ngModel)]="tripFilters.status" name="status">
+            <option value="">Todos los estados</option>
+            <option value="assigned">Asignado</option>
+            <option value="driver_arrived">Conductor llegó</option>
+            <option value="in_progress">En curso</option>
+            <option value="completed">Completado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+          <input type="date" [(ngModel)]="tripFilters.date" name="date" />
+          <input type="number" [(ngModel)]="tripFilters.driver_id" name="driver_id" placeholder="ID conductor" />
+          <input type="number" [(ngModel)]="tripFilters.client_id" name="client_id" placeholder="ID cliente" />
+          <button class="btn-approve" (click)="loadTrips()">Filtrar</button>
+          <button class="btn-reject" (click)="clearTripFilters()">Limpiar</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Cliente</th>
+                  <th>Conductor</th>
+                  <th>Ruta</th>
+                  <th>Tarifa</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of filtered(trips); track t.id) {
+                  <tr>
+                    <td class="muted">#{{ t.id }}</td>
+                    <td>{{ t.client?.name ?? t.client?.user?.name ?? '—' }}</td>
+                    <td>{{ t.driver?.user?.name ?? '—' }}</td>
+                    <td class="route">{{ t.origin_name ?? t.request?.origin_name ?? '' }} → {{ t.destination_name ?? t.request?.destination_name ?? '' }}</td>
+                    <td class="ride-mono">{{ cop(t.final_fare ?? t.estimated_fare) }}</td>
+                    <td class="muted">{{ (t.completed_at ?? t.created_at) | date: 'dd/MM/yy h:mm a' }}</td>
+                    <td>
+                      <span class="ride-chip" [class.red]="t.status === 'cancelled'" [class.gray]="t.status !== 'completed' && t.status !== 'cancelled'">
+                        {{ statusLabel(t.status) }}
+                      </span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="7" class="empty">No hay viajes con estos filtros.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- ================= TARIFAS ================= -->
+      @if (section === 'fares') {
+        <div class="filters">
+          <button class="btn-approve" (click)="openFare()">+ Nueva tarifa</button>
+        </div>
+        <div class="fare-grid">
+          @for (f of filtered(fares); track f.id) {
+            <div class="panel fare-card" [class.active]="f.active">
+              <div class="panel-head">
+                <h2>{{ f.name }}</h2>
+                @if (f.active) {
+                  <span class="active-dot">● Activa</span>
+                }
+              </div>
+              <dl class="ride-mono fare-list">
+                <dt>Base</dt><dd>{{ cop(f.base_fare) }}</dd>
+                <dt>Por km</dt><dd>{{ cop(f.price_per_km) }}</dd>
+                <dt>Por minuto</dt><dd>{{ cop(f.price_per_minute) }}</dd>
+                <dt>Mínima</dt><dd>{{ cop(f.minimum_fare) }}</dd>
+                <dt>Multiplicador</dt><dd class="green">×{{ f.surge_multiplier }}</dd>
+              </dl>
+            </div>
+          } @empty {
+            <p class="empty">No hay tarifas registradas.</p>
+          }
+        </div>
+      }
+
+      <!-- ================= REPORTES ================= -->
+      @if (section === 'reports' && report) {
+        <section class="kpis auto">
+          @for (e of entries(report); track e.key) {
+            @if (isNumber(e.value)) {
+              <div class="kpi">
+                <small>{{ label(e.key) }}</small>
+                <strong>{{ e.key.includes('revenue') || e.key.includes('ingreso') ? cop(e.value) : e.value }}</strong>
+              </div>
+            }
+          }
+        </section>
+        @for (e of entries(report); track e.key) {
+          @if (isObject(e.value)) {
+            <div class="panel">
+              <h2>{{ label(e.key) }}</h2>
+              <dl class="kv">
+                @for (x of entries(e.value); track x.key) {
+                  <dt>{{ label(x.key) }}</dt>
+                  <dd>{{ cell(x.value) }}</dd>
+                }
+              </dl>
+            </div>
+          }
+          @if (isList(e.value)) {
+            <div class="panel">
+              <h2>{{ label(e.key) }}</h2>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      @for (c of columns(e.value); track c) {
+                        <th>{{ label(c) }}</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of filtered(e.value); track $index) {
+                      <tr>
+                        @for (c of columns(e.value); track c) {
+                          <td>{{ cell(row[c]) }}</td>
+                        }
+                      </tr>
+                    } @empty {
+                      <tr><td class="empty">Sin datos.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        }
+      }
+
+      <!-- ================= AUDITORÍA ================= -->
+      @if (section === 'audit') {
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  @for (c of columns(logs); track c) {
+                    <th>{{ label(c) }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of filtered(logs); track $index) {
+                  <tr>
+                    @for (c of columns(logs); track c) {
+                      <td>{{ cell(row[c]) }}</td>
+                    }
+                  </tr>
+                } @empty {
+                  <tr><td class="empty">No hay registros de auditoría.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+
+  <!-- Modal aprobar / rechazar -->
+  @if (decision) {
+    <div class="ride-modal-backdrop" (click)="decision = null">
+      <div class="ride-modal" (click)="$event.stopPropagation()">
+        <h3>
+          {{ decision.status === 'approved' ? 'Aprobar' : decision.status === 'rejected' ? 'Rechazar' : 'Suspender' }}
+          a {{ decision.driver.user?.name }}
+        </h3>
+        <span class="ride-label">{{ decision.status === 'approved' ? 'Notas (opcional)' : 'Motivo' }}</span>
+        <textarea class="ride-input" rows="3" [(ngModel)]="decision.notes" name="notes" placeholder="Ej. Licencia vencida"></textarea>
+        <button
+          class="ride-btn"
+          [class.danger-solid]="decision.status !== 'approved'"
+          (click)="confirmDecision()"
+          [disabled]="deciding"
+        >
+          {{ deciding ? 'Guardando…' : 'Confirmar' }}
+        </button>
+        <button class="ride-btn outline mt" (click)="decision = null">Cancelar</button>
+      </div>
+    </div>
+  }
+
+  <!-- Modal nueva tarifa -->
+  @if (fareOpen) {
+    <div class="ride-modal-backdrop" (click)="fareOpen = false">
+      <div class="ride-modal" (click)="$event.stopPropagation()">
+        <h3>Nueva tarifa</h3>
+        <span class="ride-label">Nombre</span>
+        <input class="ride-input" [(ngModel)]="fareForm.name" name="fname" placeholder="Tarifa Hora Pico" />
+        <div class="two">
+          <div>
+            <span class="ride-label">Tarifa base</span>
+            <input class="ride-input" type="number" [(ngModel)]="fareForm.base_fare" name="base" />
+          </div>
+          <div>
+            <span class="ride-label">Precio por km</span>
+            <input class="ride-input" type="number" [(ngModel)]="fareForm.price_per_km" name="pkm" />
+          </div>
+          <div>
+            <span class="ride-label">Precio por minuto</span>
+            <input class="ride-input" type="number" [(ngModel)]="fareForm.price_per_minute" name="pmin" />
+          </div>
+          <div>
+            <span class="ride-label">Tarifa mínima</span>
+            <input class="ride-input" type="number" [(ngModel)]="fareForm.minimum_fare" name="min" />
+          </div>
+          <div>
+            <span class="ride-label">Multiplicador</span>
+            <input class="ride-input" type="number" step="0.1" [(ngModel)]="fareForm.surge_multiplier" name="surge" />
+          </div>
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="fareForm.active" name="active" />
+            Activar ahora
+          </label>
+        </div>
+        <button class="ride-btn" (click)="saveFare()" [disabled]="fareSaving">{{ fareSaving ? 'Guardando…' : 'Guardar tarifa' }}</button>
+        <button class="ride-btn outline mt" (click)="fareOpen = false">Cancelar</button>
+      </div>
+    </div>
+  }
+
+  @if (toast) {
+    <div class="toast">{{ toast }}</div>
+  }
+</ion-content>

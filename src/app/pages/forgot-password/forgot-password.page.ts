@@ -1,20 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import {
-  IonContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonBackButton,
-  IonList,
-  IonItem,
-  IonInput,
-  IonButton,
-  IonText,
-  IonSpinner,
-} from '@ionic/angular';
+import { IonContent, IonSpinner } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth.service';
 import { apiErrorMessage } from '../../core/utils/api-error';
 
@@ -22,21 +9,7 @@ import { apiErrorMessage } from '../../core/utils/api-error';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.page.html',
   styleUrls: ['./forgot-password.page.scss'],
-  imports: [
-    FormsModule,
-    IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonBackButton,
-    IonList,
-    IonItem,
-    IonInput,
-    IonButton,
-    IonText,
-    IonSpinner,
-  ],
+  imports: [FormsModule, IonContent, IonSpinner],
 })
 export class ForgotPasswordPage {
   private auth = inject(AuthService);

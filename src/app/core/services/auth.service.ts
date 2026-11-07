@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { appStorage } from '../utils/storage';
 
 export type Role = 'admin' | 'client' | 'driver';
 
@@ -48,7 +49,10 @@ export class AuthService {
   login(login: string, password: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.api}/auth/login`, { login, password })
-      .pipe(tap((res) => this.saveSession(res)));
+      .pipe(
+        timeout(10000),
+        tap((res) => this.saveSession(res)),
+      );
   }
 
   /** POST /api/auth/register */
@@ -73,25 +77,29 @@ export class AuthService {
 
   /** POST /api/auth/logout */
   logout(): Observable<unknown> {
-    return this.http.post(`${this.api}/auth/logout`, {}).pipe(tap(() => this.clearSession()));
+    return this.http.post(`${this.api}/auth/logout`, {}).pipe(
+      timeout(5000),
+      tap(() => this.clearSession()),
+    );
   }
 
   saveSession(res: AuthResponse): void {
-    localStorage.setItem('token', res.access_token);
-    localStorage.setItem('user', JSON.stringify(res.user));
+    appStorage.setItem('token', res.access_token);
+    appStorage.setItem('user', JSON.stringify(res.user));
   }
 
   clearSession(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    appStorage.removeItem('token');
+    appStorage.removeItem('user');
+    appStorage.removeItem('driver_trip');
   }
 
   get token(): string | null {
-    return localStorage.getItem('token');
+    return appStorage.getItem('token');
   }
 
   get user(): User | null {
-    const raw = localStorage.getItem('user');
+    const raw = appStorage.getItem('user');
     return raw ? (JSON.parse(raw) as User) : null;
   }
 
@@ -104,9 +112,12 @@ export class AuthService {
     switch (role) {
       case 'client':
         return '/client';
+      case 'driver':
+        return '/driver';
+      case 'admin':
+        return '/admin';
       default:
-        // Conductor y admin: pantalla general por ahora
-        return '/home';
+        return '/login';
     }
   }
 }

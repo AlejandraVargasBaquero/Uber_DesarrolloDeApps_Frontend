@@ -1,24 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  IonContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonBackButton,
-  IonList,
-  IonListHeader,
-  IonLabel,
-  IonItem,
-  IonInput,
-  IonButton,
-  IonText,
-  IonSpinner,
-  IonSegment,
-  IonSegmentButton,
-} from '@ionic/angular';
+import { IonContent, IonSpinner } from '@ionic/angular';
 import { AuthService, RegisterData } from '../../core/services/auth.service';
 import { apiErrorMessage } from '../../core/utils/api-error';
 
@@ -26,29 +9,11 @@ import { apiErrorMessage } from '../../core/utils/api-error';
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
-  imports: [
-    FormsModule,
-    IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonBackButton,
-    IonList,
-    IonListHeader,
-    IonLabel,
-    IonItem,
-    IonInput,
-    IonButton,
-    IonText,
-    IonSpinner,
-    IonSegment,
-    IonSegmentButton,
-  ],
+  imports: [FormsModule, IonContent, IonSpinner],
 })
 export class RegisterPage {
   private auth = inject(AuthService);
-  private router = inject(Router);
+  router = inject(Router);
 
   role: 'client' | 'driver' =
     inject(ActivatedRoute).snapshot.queryParamMap.get('role') === 'driver' ? 'driver' : 'client';

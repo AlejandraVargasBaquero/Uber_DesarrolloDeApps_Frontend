@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Coordinates {
@@ -49,17 +49,19 @@ export class ClientService {
 
   /** POST /api/client/estimate-fare */
   estimateFare(data: Coordinates): Observable<{ success: boolean; estimate: FareEstimate }> {
-    return this.http.post<{ success: boolean; estimate: FareEstimate }>(`${this.api}/client/estimate-fare`, data);
+    return this.http
+      .post<{ success: boolean; estimate: FareEstimate }>(`${this.api}/client/estimate-fare`, data)
+      .pipe(timeout(20000));
   }
 
   /** POST /api/client/ride-requests */
   createRideRequest(data: RideRequestData): Observable<any> {
-    return this.http.post<any>(`${this.api}/client/ride-requests`, data);
+    return this.http.post<any>(`${this.api}/client/ride-requests`, data).pipe(timeout(20000));
   }
 
   /** GET /api/client/active */
   active(): Observable<any> {
-    return this.http.get<any>(`${this.api}/client/active`);
+    return this.http.get<any>(`${this.api}/client/active`).pipe(timeout(15000));
   }
 
   /** POST /api/client/cancel/{id} */
@@ -69,6 +71,7 @@ export class ClientService {
 
   /** GET /api/client/trips */
   trips(page = 1): Observable<any> {
+    // Respuesta paginada de Laravel: { trips: { data, current_page, last_page } }
     return this.http.get<any>(`${this.api}/client/trips`, { params: { page } });
   }
 

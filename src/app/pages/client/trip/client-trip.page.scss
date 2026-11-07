@@ -1,0 +1,275 @@
+.screen {
+  min-height: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  background: var(--ride-green);
+  color: #0e0f0f;
+  border-radius: 0 0 28px 28px;
+  padding: calc(28px + env(safe-area-inset-top)) 24px 26px;
+
+  &.searching {
+    background: linear-gradient(135deg, #2ee28a, #22c476);
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+  }
+
+  .live {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0e0f0f;
+
+    &.pulse {
+      animation: pulse 1.4s infinite;
+    }
+  }
+
+  .big {
+    margin: 14px 0 6px;
+    font-size: 84px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -4px;
+
+    span {
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      margin-left: 6px;
+      font-weight: 700;
+    }
+  }
+
+  .sub {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  ion-spinner {
+    color: #0e0f0f;
+    margin: 24px 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.body {
+  flex: 1;
+  padding: 22px 20px 8px;
+}
+
+.notice {
+  background: #f5a62322;
+  color: #f5a623;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.driver {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+
+  .ride-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  strong {
+    display: block;
+    font-size: 16px;
+  }
+
+  small {
+    color: var(--ride-muted);
+    font-size: 12px;
+  }
+}
+
+.plate-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--ride-surface);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  small {
+    color: var(--ride-muted);
+    font-size: 11px;
+  }
+
+  .plate {
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 2px;
+    border: 1.5px solid var(--ride-text);
+    border-radius: 8px;
+    padding: 4px 14px;
+  }
+}
+
+.map-card {
+  height: 190px;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid var(--ride-line);
+
+  &.hidden {
+    display: none;
+  }
+
+  .map {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.route {
+  margin-bottom: 12px;
+}
+
+.fare-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 4px;
+  font-size: 14px;
+  color: var(--ride-muted);
+
+  strong {
+    color: var(--ride-text);
+    font-size: 17px;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ride-text);
+
+  svg,
+  b {
+    width: 54px;
+    height: 54px;
+    padding: 16px;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+
+  &.call svg {
+    background: var(--ride-surface);
+    color: var(--ride-green);
+  }
+
+  &.cancel {
+    color: #ff6b6b;
+
+    svg {
+      border: 1.5px solid #ff6b6b88;
+    }
+  }
+
+  &.sos {
+    color: #ff6b6b;
+
+    b {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: #ff3b3b;
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 0 0 6px #ff3b3b33;
+    }
+  }
+}
+
+.muted {
+  color: var(--ride-muted);
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+
+.mt {
+  margin-top: 12px;
+}
+
+.reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.reason {
+  background: none;
+  border: 1px solid var(--ride-line);
+  color: var(--ride-text);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &.on {
+    border-color: var(--ride-green);
+    background: #2ee28a1f;
+    color: var(--ride-green);
+  }
+}
+
+.ride-btn.danger-solid {
+  background: #ff4d4d;
+  color: #fff;
+}

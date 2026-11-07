@@ -1,0 +1,122 @@
+<ion-content [fullscreen]="true" class="ride-page">
+  <div class="screen">
+    <header>
+      <div>
+        <small>Conductor · {{ approvalLabel }}</small>
+        <h1>{{ shortName }}</h1>
+      </div>
+      <button class="ride-avatar" (click)="menuOpen = !menuOpen" aria-label="Menú">{{ initials(user?.name) }}</button>
+    </header>
+
+    @if (menuOpen) {
+      <div class="menu">
+        <button (click)="logout()">Cerrar sesión</button>
+      </div>
+    }
+
+    @if (approval !== 'approved') {
+      <div class="approval">
+        <strong>Tu cuenta está {{ approvalLabel }}</strong>
+        <p>Cuando un administrador apruebe tus documentos podrás conectarte y recibir solicitudes.</p>
+      </div>
+    }
+
+    <!-- Interruptor de disponibilidad -->
+    <button class="online-card" [class.on]="online" (click)="toggleOnline()" [disabled]="toggling">
+      <div>
+        <strong>{{ online ? 'EN LÍNEA' : 'DESCONECTADO' }}</strong>
+        <small>{{ online ? 'Recibiendo solicitudes' : 'Toca para empezar a recibir viajes' }}</small>
+      </div>
+      @if (toggling) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        <span class="switch" [class.on]="online"><span></span></span>
+      }
+    </button>
+
+    <div class="stats">
+      <div>
+        <small>Ganado hoy</small>
+        <strong>{{ cop(earnings.total) }}</strong>
+      </div>
+      <div class="sep"></div>
+      <div>
+        <small>Viajes</small>
+        <strong>{{ earnings.trips }}</strong>
+      </div>
+    </div>
+
+    @if (error) {
+      <p class="ride-error">{{ error }}</p>
+    }
+    @if (info) {
+      <p class="info">{{ info }}</p>
+    }
+
+    @if (online) {
+      @if (current; as req) {
+        <div class="request">
+          <div class="timer" [style.width.%]="(remaining / acceptSeconds) * 100"></div>
+          <div class="req-top">
+            <span class="ride-chip">Nueva solicitud</span>
+            <span class="ride-mono dist">
+              @if (req.estimated_distance_km) {
+                {{ km(req.estimated_distance_km) }} ·
+              }
+              {{ remaining | number: '1.0-0' }}s
+            </span>
+          </div>
+          <p class="fare">{{ cop(req.estimated_fare) }}</p>
+          <div class="ride-route-dots">
+            <p class="row"><span class="o"></span>{{ req.origin_name }}</p>
+            <p class="row"><span class="d"></span>{{ req.destination_name }}</p>
+          </div>
+          @if (req.client?.name) {
+            <p class="client">Cliente: {{ req.client.name }}</p>
+          }
+
+          <div class="slider" #track (pointermove)="onMove($event)" (pointerup)="onUp()" (pointercancel)="onUp()">
+            <div class="fill" [style.width.px]="slideX + 52"></div>
+            <span class="slider-text">{{ accepting ? 'Aceptando…' : 'Desliza para aceptar' }}</span>
+            <button
+              class="knob"
+              [style.transform]="'translateX(' + slideX + 'px)'"
+              [class.anim]="slideX === 0"
+              (pointerdown)="onDown($event, track)"
+              (keydown.enter)="accept()"
+              aria-label="Aceptar solicitud"
+            >
+              @if (accepting) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else {
+                →
+              }
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="waiting">
+          <span class="radar"></span>
+          <p>Esperando solicitudes cercanas…</p>
+        </div>
+      }
+    } @else {
+      <div class="waiting off">
+        <p>Estás desconectado. Activa el interruptor para recibir viajes.</p>
+      </div>
+    }
+
+    <div class="spacer"></div>
+
+    @if (online && current) {
+      <footer>
+        <span>
+          @if (visible.length > 1) {
+            +{{ visible.length - 1 }} solicitud{{ visible.length > 2 ? 'es' : '' }} en espera
+          }
+        </span>
+        <button (click)="ignore()">Ignorar esta</button>
+      </footer>
+    }
+  </div>
+</ion-content>

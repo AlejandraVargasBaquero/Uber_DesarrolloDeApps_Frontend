@@ -1,18 +1,14 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar class="ride-toolbar">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/client" text=""></ion-back-button>
-    </ion-buttons>
-    <ion-title>Mis viajes</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ride-page ion-padding">
-  <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+<ion-content [fullscreen]="true" class="ride-page">
+  <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="ride-container">
+  <div class="screen">
+    <header>
+      <button class="back" (click)="router.navigateByUrl('/client')" aria-label="Volver">←</button>
+      <h1>Mis <span>viajes</span></h1>
+    </header>
+
     @if (error) {
       <p class="ride-error">{{ error }}</p>
     }
@@ -25,43 +21,91 @@
         <button class="ride-btn" (click)="router.navigateByUrl('/client')">Pedir mi primer viaje →</button>
       </div>
     } @else {
-      @for (trip of trips; track trip.id) {
-        <div class="ride-card trip">
-          <div class="row">
-            <span class="badge" [class.ok]="trip.status === 'completed'" [class.ko]="trip.status === 'cancelled'">
-              {{ statusLabel(trip.status) }}
-            </span>
-            @if (trip.final_fare) {
-              <span class="fare">$ {{ trip.final_fare | number: '1.0-0' }}</span>
-            }
+      @for (t of trips; track t.id) {
+        <button class="trip" (click)="selected = t">
+          <div class="trip-top">
+            <span class="date">{{ dateOf(t) | date: 'd MMM y · h:mm a' }}</span>
+            <strong>{{ cop(amount(t)) }}</strong>
           </div>
-
-          @if (trip.origin_name || trip.destination_name) {
-            <p class="route">{{ trip.origin_name }} → {{ trip.destination_name }}</p>
+          @if (t.origin_name || t.destination_name) {
+            <div class="ride-route-dots">
+              <p class="row"><span class="o"></span>{{ t.origin_name }}</p>
+              <p class="row"><span class="d"></span>{{ t.destination_name }}</p>
+            </div>
           }
-
-          <p class="muted">
-            @if (trip.driver?.user?.name) {
-              {{ trip.driver.user.name }}
-            }
-            @if (trip.vehicle?.plate) {
-              · {{ trip.vehicle.plate }}
-            }
-          </p>
-
-          @if (trip.completed_at) {
-            <p class="muted small">{{ trip.completed_at | date: 'dd/MM/yyyy h:mm a' }}</p>
-          }
-
-          @if (trip.status === 'completed') {
-            @if (trip.rating) {
-              <p class="rated">Calificado ★ {{ trip.rating.score }}</p>
-            } @else {
-              <button class="ride-link rate" (click)="rate(trip)">Calificar viaje ★</button>
-            }
-          }
-        </div>
+          <div class="trip-bottom">
+            <span class="ride-chip" [class.red]="t.status === 'cancelled'" [class.gray]="t.status !== 'completed' && t.status !== 'cancelled'">
+              {{ statusLabel(t.status) }}
+            </span>
+            <small>{{ t.driver?.user?.name }} @if (t.vehicle?.plate) { · {{ t.vehicle.plate }} }</small>
+          </div>
+        </button>
       }
+
+      <ion-infinite-scroll (ionInfinite)="more($event)" [disabled]="!hasMore">
+        <ion-infinite-scroll-content loadingSpinner="crescent"></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
     }
   </div>
+
+  <!-- Detalle -->
+  @if (selected) {
+    <div class="ride-modal-backdrop" (click)="selected = null">
+      <div class="ride-modal" (click)="$event.stopPropagation()">
+        <h3>Viaje #{{ selected.id }}</h3>
+        <div class="ride-route-dots">
+          <p class="row"><span class="o"></span>{{ selected.origin_name ?? 'Origen' }}</p>
+          <p class="row"><span class="d"></span>{{ selected.destination_name ?? 'Destino' }}</p>
+        </div>
+
+        <div class="grid">
+          <div>
+            <small>Tarifa</small>
+            <strong>{{ cop(amount(selected)) }}</strong>
+          </div>
+          <div>
+            <small>Estado</small>
+            <strong>{{ statusLabel(selected.status) }}</strong>
+          </div>
+          @if (selected.distance_travelled_km || selected.estimated_distance_km) {
+            <div>
+              <small>Distancia</small>
+              <strong>{{ km(selected.distance_travelled_km ?? selected.estimated_distance_km) }}</strong>
+            </div>
+          }
+          @if (selected.duration_travelled_min || selected.estimated_duration_min) {
+            <div>
+              <small>Duración</small>
+              <strong>{{ selected.duration_travelled_min ?? selected.estimated_duration_min }} min</strong>
+            </div>
+          }
+          @if (selected.driver?.user?.name) {
+            <div>
+              <small>Conductor</small>
+              <strong>{{ selected.driver.user.name }}</strong>
+            </div>
+          }
+          @if (selected.vehicle?.plate) {
+            <div>
+              <small>Vehículo</small>
+              <strong>{{ selected.vehicle.plate }}</strong>
+            </div>
+          }
+        </div>
+
+        @if (dateOf(selected)) {
+          <p class="muted">{{ dateOf(selected) | date: "EEEE d 'de' MMMM, h:mm a" }}</p>
+        }
+
+        @if (selected.status === 'completed') {
+          @if (selected.rating) {
+            <p class="ride-success">Calificaste este viaje con ★ {{ selected.rating.score }}</p>
+          } @else {
+            <button class="ride-btn" (click)="rate(selected)">Calificar viaje</button>
+          }
+        }
+        <button class="ride-btn outline mt" (click)="selected = null">Cerrar</button>
+      </div>
+    </div>
+  }
 </ion-content>

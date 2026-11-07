@@ -1,0 +1,92 @@
+<ion-content [fullscreen]="true" class="ride-page">
+  @if (trip) {
+    <div class="screen">
+      <!-- Progreso de los 4 estados -->
+      <div class="progress">
+        @for (s of steps; track s.key; let i = $index) {
+          <span class="bar" [class.on]="i <= stepIndex"></span>
+        }
+      </div>
+      <div class="progress-labels">
+        <span>
+          @for (s of steps; track s.key; let i = $index; let last = $last) {
+            <b [class.current]="i === stepIndex">{{ s.label }}</b>
+            @if (!last) {
+              ·
+            }
+          }
+        </span>
+        <span class="ride-mono">VIAJE #{{ trip.id }}</span>
+      </div>
+
+      <div class="map-card"><div class="map" #mapEl></div></div>
+
+      <small class="ride-label">{{ heading }}</small>
+      <h2 class="address">{{ address }}</h2>
+
+      <div class="metrics">
+        <div>
+          <small>Distancia</small>
+          <strong class="ride-mono">{{ distanceText }}</strong>
+        </div>
+        <div>
+          <small>Tiempo</small>
+          <strong class="ride-mono">{{ timeText }}</strong>
+        </div>
+        <div class="fare">
+          <small>{{ trip.status === 'completed' ? 'Tarifa final' : 'Tarifa' }}</small>
+          <strong class="ride-mono">{{ cop(fareValue) }}</strong>
+        </div>
+      </div>
+
+      <div class="client">
+        <span class="ride-avatar">{{ initials(trip.client?.name) }}</span>
+        <div>
+          <strong>{{ trip.client?.name ?? 'Cliente' }}</strong>
+          @if (trip.client?.phone) {
+            <small class="ride-mono">{{ trip.client.phone }}</small>
+          }
+        </div>
+        @if (trip.client?.phone && trip.status !== 'completed') {
+          <button class="call" (click)="call()" aria-label="Llamar al cliente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        }
+      </div>
+
+      @if (trip.status === 'completed') {
+        <div class="summary">
+          <span class="ride-chip">✓ Viaje finalizado</span>
+          <p>Cobra al pasajero <strong>{{ cop(trip.final_fare) }}</strong>. Ya quedaste disponible para nuevos viajes.</p>
+        </div>
+      }
+
+      @if (error) {
+        <p class="ride-error">{{ error }}</p>
+      }
+
+      <div class="spacer"></div>
+
+      <button class="ride-btn" [class.light]="trip.status === 'in_progress'" (click)="next()" [disabled]="busy">
+        @if (busy) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          {{ actionLabel }}
+        }
+      </button>
+    </div>
+  } @else {
+    <div class="screen empty">
+      <h2 class="address">No hay un viaje activo</h2>
+      <p class="muted">Este viaje ya terminó o se abrió en otra pestaña.</p>
+      <button class="ride-btn" (click)="done()">Volver a solicitudes</button>
+    </div>
+  }
+</ion-content>

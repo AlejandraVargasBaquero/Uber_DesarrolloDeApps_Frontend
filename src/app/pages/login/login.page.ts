@@ -20,6 +20,13 @@ export class LoginPage {
   error = '';
   loading = false;
 
+  ionViewWillEnter(): void {
+    const user = this.auth.user;
+    if (this.auth.isLoggedIn() && user) {
+      this.router.navigateByUrl(this.auth.homeFor(user.role), { replaceUrl: true });
+    }
+  }
+
   goRegister(role: 'client' | 'driver'): void {
     this.router.navigate(['/register'], { queryParams: { role } });
   }

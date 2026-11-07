@@ -1,11 +1,46 @@
+.screen {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: calc(20px + env(safe-area-inset-top)) 20px 24px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+
+  h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -1px;
+
+    span {
+      color: var(--ride-green);
+    }
+  }
+}
+
+.back {
+  background: var(--ride-surface);
+  border: none;
+  color: var(--ride-text);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+
 .center {
   display: flex;
   justify-content: center;
   padding: 40px 0;
-}
 
-ion-spinner {
-  color: var(--ride-green);
+  ion-spinner {
+    color: var(--ride-green);
+  }
 }
 
 .empty {
@@ -18,56 +53,79 @@ ion-spinner {
   }
 }
 
-.row {
+.trip {
+  width: 100%;
+  text-align: left;
+  background: var(--ride-surface);
+  border: none;
+  border-radius: 18px;
+  padding: 16px 18px 14px;
+  margin-bottom: 12px;
+  color: var(--ride-text);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.trip-top {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+
+  .date {
+    color: var(--ride-muted);
+    font-size: 12px;
+    text-transform: capitalize;
+  }
+
+  strong {
+    font-size: 18px;
+  }
+}
+
+.trip-bottom {
+  display: flex;
   align-items: center;
-  margin-bottom: 10px;
-}
+  gap: 10px;
+  margin-top: 4px;
 
-.badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--ride-line);
-
-  &.ok {
-    background: #2ee28a22;
-    color: var(--ride-green);
-  }
-
-  &.ko {
-    background: #ff6b6b22;
-    color: #ff6b6b;
+  small {
+    color: var(--ride-muted);
+    font-size: 12px;
   }
 }
 
-.fare {
-  font-weight: 700;
-  font-size: 18px;
-}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 8px 0 16px;
 
-.route {
-  margin: 0 0 6px;
-  font-weight: 500;
+  div {
+    background: var(--ride-surface);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  small {
+    color: var(--ride-muted);
+    font-size: 11px;
+  }
+
+  strong {
+    font-size: 15px;
+  }
 }
 
 .muted {
   color: var(--ride-muted);
-  margin: 0 0 4px;
-}
-
-.small {
-  font-size: 12px;
-}
-
-.rate {
-  margin-top: 10px;
-}
-
-.rated {
-  color: var(--ride-green);
   font-size: 13px;
-  margin: 10px 0 0;
+  text-transform: capitalize;
+  margin: 0 0 16px;
+}
+
+.mt {
+  margin-top: 10px;
 }

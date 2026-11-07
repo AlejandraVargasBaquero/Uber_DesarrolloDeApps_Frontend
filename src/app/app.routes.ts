@@ -1,5 +1,5 @@
 import type { Routes } from '@angular/router';
-import { authGuard, roleGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   // Públicas
@@ -16,11 +16,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/forgot-password/forgot-password.page').then((m) => m.ForgotPasswordPage),
   },
 
-  // Cliente
+  // Pasajero
   {
     path: 'client',
     canActivate: [roleGuard('client')],
     loadComponent: () => import('./pages/client/home/client-home.page').then((m) => m.ClientHomePage),
+  },
+  {
+    path: 'client/trip',
+    canActivate: [roleGuard('client')],
+    loadComponent: () => import('./pages/client/trip/client-trip.page').then((m) => m.ClientTripPage),
   },
   {
     path: 'client/trips',
@@ -33,11 +38,23 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/client/rate/client-rate.page').then((m) => m.ClientRatePage),
   },
 
-  // Conductor / admin (pantalla general por ahora)
+  // Conductor
   {
-    path: 'home',
-    canActivate: [authGuard],
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    path: 'driver',
+    canActivate: [roleGuard('driver')],
+    loadComponent: () => import('./pages/driver/home/driver-home.page').then((m) => m.DriverHomePage),
+  },
+  {
+    path: 'driver/trip',
+    canActivate: [roleGuard('driver')],
+    loadComponent: () => import('./pages/driver/trip/driver-trip.page').then((m) => m.DriverTripPage),
+  },
+
+  // Administrador
+  {
+    path: 'admin',
+    canActivate: [roleGuard('admin')],
+    loadComponent: () => import('./pages/admin/admin.page').then((m) => m.AdminPage),
   },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
