@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular';
 import { AuthService } from '../../core/services/auth.service';
 import { apiErrorMessage } from '../../core/utils/api-error';
+import { useAutoRefresh } from '../../core/utils/ui-refresh';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,6 +13,8 @@ import { apiErrorMessage } from '../../core/utils/api-error';
   imports: [FormsModule, IonContent, IonSpinner],
 })
 export class ForgotPasswordPage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   private auth = inject(AuthService);
   router = inject(Router);
 

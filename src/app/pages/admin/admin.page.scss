@@ -232,7 +232,6 @@ header {
     margin: 0 0 12px;
     font-size: 16px;
     font-weight: 700;
-    text-transform: capitalize;
 
     &.mt {
       margin-top: 22px;
@@ -394,7 +393,6 @@ table {
 
   dt {
     color: var(--ride-muted);
-    text-transform: capitalize;
   }
 
   dd {

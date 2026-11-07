@@ -7,6 +7,7 @@ import { LatLng, MapService } from '../../../core/services/map.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, firstName, haversineKm, initials, km } from '../../../core/utils/format';
 import { appStorage } from '../../../core/utils/storage';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 const SEARCH_LIMIT_SECONDS = 180; // HU-06: aviso si nadie acepta en 3 minutos
 const CANCEL_REASONS = [
@@ -24,6 +25,8 @@ const CANCEL_REASONS = [
   imports: [FormsModule, IonContent, IonSpinner],
 })
 export class ClientTripPage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   @ViewChild('mapEl') mapEl!: ElementRef<HTMLDivElement>;
 
   private client = inject(ClientService);
@@ -73,8 +76,8 @@ export class ClientTripPage {
     this.searchStartedAt = this.request?.created_at ? new Date(this.request.created_at).getTime() : Date.now();
     this.load();
     // HU-08: actualización periódica (la API no tiene sockets)
-    this.pollId = setInterval(() => this.load(true), 7000);
-    this.tickId = setInterval(() => (this.elapsed = Math.max(0, Math.floor((Date.now() - this.searchStartedAt) / 1000))), 1000);
+    this.pollId = this.ui.interval(() => this.load(true), 5000);
+    this.tickId = this.ui.interval(() => (this.elapsed = Math.max(0, Math.floor((Date.now() - this.searchStartedAt) / 1000))), 1000);
   }
 
   ionViewDidEnter(): void {
@@ -352,5 +355,6 @@ export class ClientTripPage {
     const intl = phone.length === 10 ? `57${phone}` : phone;
     window.open(`https://wa.me/${intl}?text=${encodeURIComponent(text)}`, '_blank');
     this.sosMessage = 'Se abrió WhatsApp con tu ubicación para enviarla.';
+    this.ui.request();
   }
 }

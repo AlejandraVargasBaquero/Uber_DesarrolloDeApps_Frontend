@@ -264,6 +264,35 @@
   margin: 0 0 10px;
 }
 
+.pay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -6px 0 12px 4px;
+  font-size: 11px;
+  color: var(--ride-muted);
+
+  span {
+    margin-right: 4px;
+  }
+
+  button {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--ride-line);
+    background: transparent;
+    color: var(--ride-muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.on {
+      border-color: var(--ride-green);
+      color: var(--ride-green);
+    }
+  }
+}
+
 /* ---- Búsqueda en el panel (tipo Google Maps) ---- */
 .sheet.open {
   top: calc(96px + env(safe-area-inset-top));

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, timeout } from 'rxjs';
+import { Observable, catchError, shareReplay, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Coordinates {
@@ -42,9 +42,22 @@ export class ClientService {
   private http = inject(HttpClient);
   private api = environment.apiUrl;
 
-  /** GET /api/fares/active (público) */
+  private fare$: Observable<any> | null = null;
+  private fareAt = 0;
+
+  /** GET /api/fares/active (público). Se guarda 1 minuto para no repetir la consulta en cada pantalla. */
   activeFare(): Observable<any> {
-    return this.http.get<any>(`${this.api}/fares/active`);
+    if (!this.fare$ || Date.now() - this.fareAt > 60000) {
+      this.fareAt = Date.now();
+      this.fare$ = this.http.get<any>(`${this.api}/fares/active`).pipe(
+        shareReplay(1),
+        catchError((err) => {
+          this.fare$ = null;
+          return throwError(() => err);
+        }),
+      );
+    }
+    return this.fare$;
   }
 
   /** POST /api/client/estimate-fare */

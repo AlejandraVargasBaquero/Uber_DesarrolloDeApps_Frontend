@@ -6,6 +6,7 @@ import { ClientService } from '../../../core/services/client.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, firstName, initials } from '../../../core/utils/format';
 import { appStorage } from '../../../core/utils/storage';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 /** Mockup 4 · Calificar (HU-11) */
 @Component({
@@ -15,6 +16,8 @@ import { appStorage } from '../../../core/utils/storage';
   imports: [FormsModule, IonContent, IonSpinner, IonToggle],
 })
 export class ClientRatePage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   private client = inject(ClientService);
   private router = inject(Router);
   private tripId = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
@@ -77,6 +80,8 @@ export class ClientRatePage {
     if (d) parts.push(`${Number(d).toLocaleString('es-CO', { maximumFractionDigits: 2 })} KM`);
     if (m) parts.push(`${m} MIN`);
     if (this.trip?.vehicle?.plate) parts.push(this.trip.vehicle.plate);
+    const pay = this.trip?.payment_method ?? appStorage.getItem('payment_method');
+    if (pay) parts.push(pay === 'card' ? 'TARJETA' : 'EFECTIVO');
     return parts.join(' · ');
   }
 

@@ -32,9 +32,9 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* El diseño RideApp es siempre oscuro: se fuerza la paleta oscura aunque el sistema esté en modo claro
+   (con dark.system.css, en Windows con modo claro varios textos salían negros sobre fondo negro). */
+@import '@ionic/angular/css/palettes/dark.always.css';
 
 /* ===== RideApp: tema global ===== */
 :root {
@@ -51,6 +51,7 @@
 /* Estilos compartidos de pantallas RideApp */
 .ride-page {
   --background: var(--ride-bg);
+  --color: var(--ride-text);
   color: var(--ride-text);
 }
 
@@ -159,8 +160,10 @@
 
 /* ===== Componentes compartidos RideApp ===== */
 ion-content.ride-page,
-ion-content.ride-login {
+ion-content.ride-login,
+ion-content.ride-auth {
   --background: var(--ride-bg);
+  --color: var(--ride-text);
 }
 
 body {

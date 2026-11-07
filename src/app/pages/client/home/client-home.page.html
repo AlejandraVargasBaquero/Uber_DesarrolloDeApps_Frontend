@@ -139,6 +139,12 @@
         @if (estimate) {
           <p class="breakdown ride-mono">{{ breakdown() }}</p>
         }
+        <!-- HU-10: método de pago (la API no tiene pagos; se guarda en el dispositivo y se muestra en el resumen) -->
+        <div class="pay">
+          <span>Pago</span>
+          <button type="button" [class.on]="payment === 'cash'" (click)="setPayment('cash')">Efectivo</button>
+          <button type="button" [class.on]="payment === 'card'" (click)="setPayment('card')">Tarjeta</button>
+        </div>
       }
 
       @if (error) {

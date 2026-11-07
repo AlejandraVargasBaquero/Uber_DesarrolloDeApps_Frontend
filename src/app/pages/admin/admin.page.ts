@@ -7,6 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { AdminService, FareData, asList } from '../../core/services/admin.service';
 import { apiErrorMessage } from '../../core/utils/api-error';
 import { cop, initials, statusLabel } from '../../core/utils/format';
+import { useAutoRefresh } from '../../core/utils/ui-refresh';
 
 type Section = 'summary' | 'drivers' | 'trips' | 'fares' | 'reports' | 'audit';
 
@@ -18,6 +19,8 @@ type Section = 'summary' | 'drivers' | 'trips' | 'fares' | 'reports' | 'audit';
   imports: [FormsModule, DatePipe, IonContent, IonSpinner],
 })
 export class AdminPage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   private auth = inject(AuthService);
   private admin = inject(AdminService);
   router = inject(Router);
@@ -330,12 +333,13 @@ export class AdminPage {
   }
 
   label(key: string): string {
-    return key.replace(/_/g, ' ');
+    const s = key.replace(/_/g, ' ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   showToast(msg: string): void {
     this.toast = msg;
-    setTimeout(() => (this.toast = ''), 3000);
+    this.ui.timeout(() => (this.toast = ''), 3000);
   }
 
   logout(): void {

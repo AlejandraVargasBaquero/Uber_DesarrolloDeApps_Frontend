@@ -8,6 +8,10 @@ export function apiErrorMessage(err: HttpErrorResponse | any, fallback = 'Ocurri
   if (err?.status === 0) {
     return 'No se pudo conectar con el servidor. Verifica tu red.';
   }
+  // El proxy de desarrollo responde 502/503/504 cuando el backend está apagado o no contesta
+  if ([502, 503, 504].includes(err?.status) && typeof err?.error !== 'object') {
+    return 'No hay conexión con la API. Verifica que el servidor esté encendido.';
+  }
   // Errores de validación de Laravel (422): { message, errors: { campo: [mensajes] } }
   const errors = err?.error?.errors;
   if (errors && typeof errors === 'object') {

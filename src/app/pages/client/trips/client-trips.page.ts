@@ -5,6 +5,7 @@ import { IonContent, IonSpinner, IonRefresher, IonRefresherContent, IonInfiniteS
 import { ClientService } from '../../../core/services/client.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, km, statusLabel } from '../../../core/utils/format';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 /** HU-12 · Historial de viajes */
 @Component({
@@ -14,6 +15,8 @@ import { cop, km, statusLabel } from '../../../core/utils/format';
   imports: [DatePipe, IonContent, IonSpinner, IonRefresher, IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent],
 })
 export class ClientTripsPage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   private client = inject(ClientService);
   router = inject(Router);
 

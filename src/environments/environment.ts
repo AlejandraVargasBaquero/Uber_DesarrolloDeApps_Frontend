@@ -4,7 +4,11 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://20.20.1.42:8000/api',
+  // '/api' pasa por el proxy de desarrollo (proxy.conf.json):
+  //   npm start / ionic serve  -> backend local  (http://localhost:8000)
+  //   npm run clase            -> servidor del profesor (proxy.clase.json)
+  // Así el navegador no hace la petición previa OPTIONS (CORS) en cada llamada y todo responde más rápido.
+  apiUrl: '/api',
 };
 
 /*

@@ -8,6 +8,7 @@ import { DEFAULT_CENTER, LatLng, MapService, PlaceSuggestion } from '../../../co
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, firstName, haversineKm, initials, km } from '../../../core/utils/format';
 import { appStorage } from '../../../core/utils/storage';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 interface Place extends LatLng {
   name: string;
@@ -21,6 +22,8 @@ interface Place extends LatLng {
   imports: [FormsModule, IonContent, IonSpinner],
 })
 export class ClientHomePage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   @ViewChild('mapEl') mapEl!: ElementRef<HTMLDivElement>;
   @ViewChild('destInput') destInput?: ElementRef<HTMLInputElement>;
 
@@ -55,6 +58,8 @@ export class ClientHomePage {
   private fare: any = null;
   private estimateSeq = 0;
   requesting = false;
+  /** HU-10: efectivo o tarjeta (la API no tiene endpoint de pagos). */
+  payment: 'cash' | 'card' = appStorage.getItem('payment_method') === 'card' ? 'card' : 'cash';
   locating = false;
   checking = true;
   menuOpen = false;
@@ -116,6 +121,7 @@ export class ClientHomePage {
       }
     } finally {
       this.locating = false;
+      this.ui.request();
     }
   }
 
@@ -132,6 +138,7 @@ export class ClientHomePage {
     if (reverse) {
       const name = await this.maps.reverse(place);
       if (this.origin === place) this.origin = { ...place, name };
+      this.ui.request();
     }
     this.refreshRoute();
   }
@@ -184,6 +191,7 @@ export class ClientHomePage {
       if (seq !== this.searchSeq) return; // llegó una búsqueda más reciente
       this.suggestions = results;
       this.searching = false;
+      this.ui.request();
     }, 350);
   }
 
@@ -313,6 +321,7 @@ export class ClientHomePage {
     }
     this.requesting = true;
     this.error = '';
+    appStorage.setItem('payment_method', this.payment);
     const payload = {
       origin_name: this.origin.name,
       origin_latitude: +this.origin.lat.toFixed(7),
@@ -325,7 +334,7 @@ export class ClientHomePage {
       next: (res) => {
         this.requesting = false;
         // Guardamos la solicitud para mostrar la ruta y calcular la llegada del conductor
-        appStorage.setItem('client_request', JSON.stringify({ ...payload, ...(res?.ride_request ?? {}) }));
+        appStorage.setItem('client_request', JSON.stringify({ ...payload, ...(res?.ride_request ?? {}), payment_method: this.payment }));
         this.router.navigateByUrl('/client/trip');
       },
       error: (err) => {
@@ -337,6 +346,11 @@ export class ClientHomePage {
         this.error = apiErrorMessage(err, 'No se pudo crear la solicitud');
       },
     });
+  }
+
+  setPayment(method: 'cash' | 'card'): void {
+    this.payment = method;
+    appStorage.setItem('payment_method', method);
   }
 
   logout(): void {

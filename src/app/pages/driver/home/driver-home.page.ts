@@ -9,6 +9,7 @@ import { MapService } from '../../../core/services/map.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, initials, km } from '../../../core/utils/format';
 import { appStorage } from '../../../core/utils/storage';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 const ACCEPT_SECONDS = 15; // HU-07: contador para aceptar
 
@@ -20,6 +21,8 @@ const ACCEPT_SECONDS = 15; // HU-07: contador para aceptar
   imports: [DecimalPipe, IonContent, IonSpinner],
 })
 export class DriverHomePage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   private auth = inject(AuthService);
   private driver = inject(DriverService);
   private maps = inject(MapService);
@@ -73,7 +76,7 @@ export class DriverHomePage {
       return;
     }
     if (this.online) this.startOnline();
-    this.tickId = setInterval(() => this.tick(), 250);
+    this.tickId = this.ui.interval(() => this.tick(), 250);
   }
 
   ionViewWillLeave(): void {
@@ -121,9 +124,9 @@ export class DriverHomePage {
   private startOnline(): void {
     this.stopOnline();
     this.loadRequests();
-    this.pollId = setInterval(() => this.loadRequests(true), 7000);
+    this.pollId = this.ui.interval(() => this.loadRequests(true), 5000);
     this.sendLocation();
-    this.gpsId = setInterval(() => this.sendLocation(), 30000);
+    this.gpsId = this.ui.interval(() => this.sendLocation(), 30000);
   }
 
   private stopOnline(): void {

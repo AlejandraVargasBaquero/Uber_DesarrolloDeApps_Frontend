@@ -6,6 +6,7 @@ import { LatLng, MapService } from '../../../core/services/map.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { cop, firstName, haversineKm, initials, km } from '../../../core/utils/format';
 import { appStorage } from '../../../core/utils/storage';
+import { useAutoRefresh } from '../../../core/utils/ui-refresh';
 
 const STEPS = [
   { key: 'assigned', label: 'Asignado' },
@@ -22,6 +23,8 @@ const STEPS = [
   imports: [IonContent, IonSpinner],
 })
 export class DriverTripPage {
+  /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
+  private ui = useAutoRefresh();
   @ViewChild('mapEl') mapEl!: ElementRef<HTMLDivElement>;
 
   private driver = inject(DriverService);
@@ -53,7 +56,7 @@ export class DriverTripPage {
     this.error = '';
     if (!this.trip) return; // se muestra el aviso "No hay un viaje activo"
     this.startGps();
-    this.tickId = setInterval(() => (this.now = Date.now()), 1000);
+    this.tickId = this.ui.interval(() => (this.now = Date.now()), 1000);
   }
 
   ionViewDidEnter(): void {
@@ -88,6 +91,8 @@ export class DriverTripPage {
         return `${n} sube en`;
       case 'in_progress':
         return `Llevando a ${n} hacia`;
+      case 'cancelled':
+        return 'Viaje cancelado por el pasajero';
       default:
         return 'Viaje finalizado';
     }
@@ -203,6 +208,15 @@ export class DriverTripPage {
 
   private fail(err: any, fallback: string): void {
     this.busy = false;
+    const msg = String(err?.error?.message ?? '');
+    // El pasajero canceló (o el viaje ya no existe): no dejar al conductor atascado
+    if (err?.error?.status === 'cancelled' || /cancel/i.test(msg) || err?.status === 404) {
+      this.trip = { ...(this.trip as DriverTrip), status: 'cancelled' };
+      this.driver.saveTrip(this.trip);
+      this.stopGps();
+      this.error = msg || 'El pasajero canceló el viaje.';
+      return;
+    }
     this.error = apiErrorMessage(err, fallback);
   }
 
@@ -223,13 +237,14 @@ export class DriverTripPage {
           }
           this.lastPos = pos;
           this.moveCar();
+          this.ui.request();
         },
         () => {},
         { enableHighAccuracy: true, maximumAge: 5000 },
       );
     }
     // POST /driver/location cada 10 s mientras hay viaje
-    this.sendId = setInterval(() => this.sendLocation(), 15000);
+    this.sendId = this.ui.interval(() => this.sendLocation(), 15000);
     this.sendLocation();
   }
 
