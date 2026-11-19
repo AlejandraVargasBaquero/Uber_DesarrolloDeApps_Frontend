@@ -25,7 +25,19 @@ const STEPS = [
 export class DriverTripPage {
   /** Repinta la página cuando llegan datos de la API, temporizadores o GPS (ver ui-refresh.ts). */
   private ui = useAutoRefresh();
-  @ViewChild('mapEl') mapEl!: ElementRef<HTMLDivElement>;
+  private mapHost: HTMLDivElement | null = null;
+
+  /** El mapa se crea apenas el contenedor existe en pantalla (está dentro de @if (trip)). */
+  @ViewChild('mapEl') set mapEl(el: ElementRef<HTMLDivElement> | undefined) {
+    if (!el || this.mapHost === el.nativeElement) return;
+    this.mapHost = el.nativeElement;
+    if (this.map) this.map.remove();
+    this.map = null;
+    this.carMarker = null;
+    this.routeDrawn = false;
+    this.map = this.maps.createMap(el.nativeElement);
+    this.drawMap();
+  }
 
   private driver = inject(DriverService);
   private maps = inject(MapService);
@@ -54,15 +66,13 @@ export class DriverTripPage {
   ionViewWillEnter(): void {
     this.trip = this.driver.currentTrip;
     this.error = '';
+    this.ui.request();
     if (!this.trip) return; // se muestra el aviso "No hay un viaje activo"
     this.startGps();
     this.tickId = this.ui.interval(() => (this.now = Date.now()), 1000);
   }
 
   ionViewDidEnter(): void {
-    if (!this.map && this.mapEl) {
-      this.map = this.maps.createMap(this.mapEl.nativeElement);
-    }
     this.drawMap();
   }
 
